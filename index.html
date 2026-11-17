@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>MUSY</title>
+<!-- Tampil seperti aplikasi (tanpa bilah alamat) -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#2a2660">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="MUSY">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<style>
+  html,body{margin:0;height:100%;background:#2a2660;overflow:hidden;font-family:-apple-system,'Segoe UI',Roboto,Arial,sans-serif}
+  /* bagian atas mengikuti warna tema supaya jam & baterai iPhone terbaca */
+  body{padding-top:env(safe-area-inset-top);box-sizing:border-box}
+  #app{position:fixed;left:0;right:0;bottom:0;top:env(safe-area-inset-top);width:100%;height:calc(100% - env(safe-area-inset-top));border:0;background:#eef3f2}
+  #muat{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+        background:linear-gradient(160deg,#241f58,#34307e 60%,#4a46a0);color:#efd9b4;transition:opacity .4s;z-index:5}
+  #muat img{width:96px;height:96px;border-radius:24px;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+  #muat b{font-size:22px;letter-spacing:.5px;color:#fff}
+  #muat small{font-size:12px;letter-spacing:3px;text-transform:uppercase}
+  .putar{width:28px;height:28px;border:3px solid rgba(239,217,180,.3);border-top-color:#efd9b4;border-radius:50%;animation:p 1s linear infinite}
+  @keyframes p{to{transform:rotate(360deg)}}
+  #muat.selesai{opacity:0;pointer-events:none}
+  #offline{display:none;position:fixed;left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));background:#7a1f1f;color:#fff;padding:12px 16px;border-radius:12px;font-size:14px;z-index:6;text-align:center}
+</style>
+</head>
+<body>
+<div id="muat">
+  <img src="icon-192.png" alt="">
+  <b>MUSY</b>
+  <small>Musyawarah Desa Candi Badut</small>
+  <div class="putar"></div>
+</div>
+<div id="offline">Tidak ada koneksi internet. Aplikasi akan dimuat ulang saat internet kembali.</div>
+<iframe id="app" title="Musyawarah Desa Candi Badut" allow="clipboard-write; web-share; fullscreen"></iframe>
+<script>
+  // ====== GANTI DI SINI bila link deployment berubah ======
+  var URL_APLIKASI = 'https://script.google.com/macros/s/AKfycbzItA5sw5l5e3PxYNwgxC1lWU6C-rqF1OnQhiy1Vjd-xSM3uAVlAe-5Aug7JNUmlJF_/exec';
+  // ========================================================
+
+  // Tambahan parameter dari alamat pembungkus diteruskan ke aplikasi, mis. ?mode=hp
+  var url = URL_APLIKASI + (location.search ? (URL_APLIKASI.indexOf('?') < 0 ? location.search : '&' + location.search.slice(1)) : '');
+  var app = document.getElementById('app'), muat = document.getElementById('muat');
+  app.addEventListener('load', function () { setTimeout(function () { muat.classList.add('selesai'); }, 300); });
+  setTimeout(function () { muat.classList.add('selesai'); }, 12000);   // jaga-jaga
+  app.src = url;
+
+  var off = document.getElementById('offline');
+  window.addEventListener('offline', function () { off.style.display = 'block'; });
+  window.addEventListener('online', function () { off.style.display = 'none'; app.src = url; });
+
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function () {});
+</script>
+</body>
+</html>
